@@ -1,5 +1,11 @@
-// Leaflet quickstart
-/* Example from Leaflet Quick Start Guide */
+//GOAL: Proportional symbols representing attribute values of mapped features
+//STEPS:
+//Step 1. Create the Leaflet map--already done in createMap()
+//Step 2. Import GeoJSON data--already done in getData()
+//Step 3. Add circle markers for point features to the map--already done in AJAX callback
+//Step 4. Determine the attribute for scaling the proportional symbols
+//Step 5. For each feature, determine its value for the selected attribute
+//Step 6. Give each feature's circle marker a radius based on its attribute value
 
 // Initialize the map with 'L.map' and set the view of the map at a geographic center (latitude: 51.505, longitude: -0.09)
 // The 'setView' method also sets the zoom level to 13
@@ -16,6 +22,7 @@ tileLayer.addTo(mymap);
 
 var marker = L.marker([39.75621, -104.99404]).addTo(mymap);
 
+//Step 2. Import GeoJSON data--already done in getData() ?????????????????? Isn't step 1 come before step 2
 // Load the data
 fetch("data/MegaCities.geojson")
 .then(function(response){
@@ -26,12 +33,14 @@ fetch("data/MegaCities.geojson")
     L.geoJson(json).addTo(mymap);
 })
 
+//Step 1. Create the Leaflet map--already done in createMap()
 /* Map of GeoJSON data from MegaCities.geojson */
 // Function to instantiate the Leaflet map
 function createMap(){
     // The map is already created globally as mymap
 }
 
+///Step #????????????????????????????????????????????????????????????????
 function onEachFeature(feature, layer) {
     //no property named popupContent; instead, create html string with all properties
     var popupContent = "";
@@ -44,6 +53,7 @@ function onEachFeature(feature, layer) {
     };
 };
 
+//Step 2. Import GeoJSON data--already done in getData()
 //function to retrieve the data and place it on the map
 function getData(){
     //load the data
@@ -59,7 +69,7 @@ function getData(){
 
 document.addEventListener('DOMContentLoaded',createMap)
 
-
+/// IS this part necessary for activity 6 ?????????????????????????????????????????/
 var geojsonFeature = {
     "type": "Feature",
     "properties": {
@@ -73,10 +83,12 @@ var geojsonFeature = {
     }
 };
 
+// IS this part a duplicate of onEachFeature ???????????????????????????????????????????????
 L.geoJSON(geojsonFeature, {
     onEachFeature: onEachFeature
 }).addTo(map);
 
+// IS this part necessary for activity 6 ?????????????????????????????????????????/
 var myLines = [{
     "type": "LineString",
     "coordinates": [[-100, 40], [-105, 45], [-110, 55]]
@@ -85,16 +97,19 @@ var myLines = [{
     "coordinates": [[-105, 40], [-110, 45], [-115, 55]]
 }];
 
+// IS this part necessary for activity 6 ?????????????????????????????????????????/
 var myStyle = {
     "color": "#ff7800",
     "weight": 5,
     "opacity": 0.65
 };
 
+// IS this part necessary for activity 6 ?????????????????????????????????????????/
 L.geoJSON(myLines, {
     style: myStyle
 }).addTo(map);
 
+// IS this part necessary for activity 6 ?????????????????????????????????????????/
 var states = [{
     "type": "Feature",
     "properties": {"party": "Republican"},
@@ -123,6 +138,7 @@ var states = [{
     }
 }];
 
+// IS this part necessary for activity 6 ?????????????????????????????????????????/
 L.geoJSON(states, {
 style: function(feature) {
     switch (feature.properties.party) {
@@ -132,22 +148,137 @@ style: function(feature) {
    }
 }).addTo(map);
 
-//.then(function(json){
-var geojsonMarkerOptions = {
-    radius: 8,
-    fillColor: "#ff7800",
-    color: "#000",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8
+//IS This a duplication of Step 1. Create the Leaflet map--already done in createMap() but with variables ?????????????????????/
+//declare map variable globally so all functions have access
+var map;
+var minValue;
+
+//step 1 create map
+function createMap(){
+
+    //create the map
+    map = L.map('map', {
+        center: [0, 0],
+        zoom: 2
+    });
+
+    //add OSM base tilelayer
+    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    }).addTo(map);
+
+    //call getData function
+    getData(map);
+};
+
+// Step 1 continued as shown on activity 6
+function calculateMinValue(data){
+    //create empty array to store all data values
+    var allValues = [];
+    //loop through each city
+    for(var city of data.features){
+        //loop through each year
+        for(var year = 1985; year <= 2015; year+=5){
+              //get population for current year
+              var value = city.properties["Pop_"+ String(year)];
+              //add value to array
+              allValues.push(value);
+        }
+    }
+    //get minimum value of our array
+    var minValue = Math.min(...allValues)
+
+    return minValue;
+}
+// Step 1 continued as shown on activity 6
+//calculate the radius of each proportional symbol
+function calcPropRadius(attValue) {
+    //constant factor adjusts symbol sizes evenly
+    var minRadius = 5;
+    //Flannery Apperance Compensation formula
+    var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+
+    return radius;
+};
+
+// What happended to Step 2????????????????????? as shown on activity 6
+//Step 3: Add circle markers for point features to the map
+function createPropSymbols(data){
+
+    //Step 4: Determine which attribute to visualize with proportional symbols
+    var attribute = "Pop_2015";
+
+    //create marker options
+    var geojsonMarkerOptions = {
+        fillColor: "#ff7800",
+        color: "#fff",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8,
+        radius: 8
     };
 
+    L.geoJson(data, {
+        pointToLayer: function (feature, latlng) {
+            //Step 5: For each feature, determine its value for the selected attribute
+            var attValue = Number(feature.properties[attribute]);
 
-L.geoJson(json, {
-    pointToLayer: function (feature, latlng){
-        return L.circleMarker(latlng, geojsonMarkerOptions);
-    }
-}).addTo(map);
+            //Step 6: Give each feature's circle marker a radius based on its attribute value
+            geojsonMarkerOptions.radius = calcPropRadius(attValue);
+
+            //create circle markers
+            return L.circleMarker(latlng, geojsonMarkerOptions);
+        }
+    }).addTo(map);
+};
+
+//Step 2: Import GeoJSON data
+function getData(){
+    //load the data
+    fetch("data/MegaCities.geojson")
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(json){
+            //calculate minimum data value
+            minValue = calculateMinValue(json);
+            //call function to create proportional symbols
+            createPropSymbols(json);
+        })
+};
+
+document.addEventListener('DOMContentLoaded',createMap)
+
+
+//Example 1.2 line 1...Step 3: Add circle markers for point features to the map
+function createPropSymbols(data){
+
+    //Step 4. Determine the attribute for scaling the proportional symbols
+    var attribute = "Pop_2015";
+
+
+//Example 1.3 line 1...Step 3: Add circle markers for point features to the map
+function createPropSymbols(data){
+    //Step 4: Determine which attribute to visualize with proportional symbols
+    var attribute = "Pop_2015";
+
+
+
+//Example 1.2 line 13...create a Leaflet GeoJSON layer and add it to the map
+L.geoJson(data, {
+    pointToLayer: function (feature, latlng) {
+            
+    //Step 5: For each feature, determine its value for the selected attribute
+    var attValue = Number(feature.properties[attribute]);
+
+    //examine the attribute value to check that it is correct
+    console.log(feature.properties, attValue);
+
+    //create circle markers
+    return L.circleMarker(latlng, geojsonMarkerOptions);
+        }
+    }).addTo(map);
+};    
 
 
 // Fetch and load GeoJSON data from the file 'MegaCities.geojson'
