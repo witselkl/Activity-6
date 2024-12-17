@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width">
-            <title>Leaflet Map</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Leaflet Map</title>
 
-        <!--put your external stylesheet links here-->
-        <link rel="stylesheet" href="lib/leaflet.css">
-        <!--[if IE<9]>
-            <link rel="stylesheet" href="css/style.ie.css">
-        <![endif]-->
+    <!-- External Leaflet stylesheet -->
+    <link rel="stylesheet" href="lib/leaflet.css">
 
-        <!-- Internal styles -->
-        <style>
-            #map {
-                height: 100vh; /* Full height */
-                width: 100%;   /* Full width */
-            }
-        </style>
-
-                
-    </head>
-    
+    <!-- Internal styles -->
+    <style>
+        #map {
+            height: 90vh; /* Full height */
+            width: 100%;   /* Full width */
+        }
+        
+        /* Style for icons in reverse and forward buttons */
+        #panel button img {
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+</head>
 
     <body>
         <!--put your initial page content here-->
@@ -29,24 +29,15 @@
         <div id="map"></div>
         <div id="panel"></div>
 
-        <svg id="Untitled-1" width="180px" height="180px">
-            <circle fill="#F47821" fill-opacity="0.8" stroke="#000000" stroke-miterlimit="10" cx="90" cy="90.001" r="89.5"/>
-        </svg>
         
         <!--you can also use this space for internal scripts;
         place these within <script> tags-->
 
-        <!--put your external script links here-->
-        
-        <script type="text/javascript" src="js/leaflet-src.js"></script>
-        <script type="text/javascript" src="lib/leaflet-providers.js"></script>
+    <!-- External Leaflet JavaScript files -->
+    <script type="text/javascript" src="js/leaflet-src.js"></script>
+    <script type="text/javascript" src="lib/leaflet-providers.js"></script>
 
-        <!-- Script Overlap (GeoJSON vs Main): Right now, you are including both geojsonTutorial.js and main.js in your index.html. Since both scripts are working on the same map and manipulating the same objects (like map), they can interfere with each other. The best approach moving forward is to stop using geojsonTutorial.js and focus only on main.js, as this is where you'll be building your final project.
-        Action: Remove the line that loads geojsonTutorial.js in index.html. Your current main.js has everything you need, so the other file is no longer necessary. -->
-        
-        <!-- <script type="text/javascript" src="js/geojsonTutorial.js"></script> -->
-
-        <script type="text/javascript" src="js/main.js"></script>
-        
-    </body>
+    <!-- Main JavaScript file for the project -->
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
 </html>

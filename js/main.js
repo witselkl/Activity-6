@@ -187,6 +187,7 @@ function pointToLayer(feature, latlng, attributes, minValue){
 
   return layer;
 }
+<<<<<<< HEAD
 
 // Updated updatePropSymbols function
 function updatePropSymbols(attribute){
@@ -345,6 +346,36 @@ function updatePropSymbols(attribute){
     var year = attribute.split("_")[1];
     //update temporal legend
     document.querySelector("span.year").innerHTML = year;
+=======
+
+// Updated updatePropSymbols function
+function updatePropSymbols(attribute){
+    // Recalculate minValue for the current attribute
+    let minValue = Infinity;
+    map.eachLayer(function(layer){
+        if (layer.feature && layer.feature.properties[attribute]){
+            const value = layer.feature.properties[attribute];
+            if (value < minValue) minValue = value;
+        }
+    });
+
+    // Update each layer with the new attribute's proportional symbols
+    map.eachLayer(function(layer){
+        if (layer.feature && layer.feature.properties[attribute]){
+            // Access feature properties
+            const props = layer.feature.properties;
+
+            // Calculate new radius based on the updated attribute
+            const radius = calcPropRadius(props[attribute], minValue);
+            layer.setRadius(radius);
+
+            // Update popup content            
+            const popupContent = `<p><b>City:</b> ${props.City}</p><p><b>Population in ${attribute.split("_")[1]}:</b> ${props[attribute]} million</p>`;
+            layer.getPopup().setContent(popupContent).update();
+        }
+    });
+}
+>>>>>>> 1284685446f798ef4a830925b4843ff8ab6da31f
 
 // Initialize map once the document is fully loaded
 document.addEventListener('DOMContentLoaded', createMap);
